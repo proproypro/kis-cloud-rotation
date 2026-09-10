@@ -1,0 +1,12 @@
+# 비밀정보 - 절대 커밋 금지
+.env
+token_cache.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# 클라우드에선 FDR로 새로 받으므로 로컬 캐시는 커밋 안 함
+data/sector/
+data/swing/

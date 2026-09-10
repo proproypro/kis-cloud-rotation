@@ -1,0 +1,48 @@
+name: KIS 섹터 순환매 자동매매
+
+on:
+  schedule:
+    - cron: '0 1 * * 1'      # 월 01:00 UTC = 월 10:00 KST → 리밸런싱
+    - cron: '40 6 * * 1-5'   # 평일 06:40 UTC = 15:40 KST → 기록
+  workflow_dispatch:          # 수동 실행(테스트용)
+    inputs:
+      mode:
+        description: 'track(기록만) 또는 rebalance(리밸런싱+기록)'
+        default: 'track'
+
+permissions:
+  contents: write             # history 커밋 위해
+
+concurrency:
+  group: kis-trade            # 동시 실행 방지
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    env:
+      KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+      KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+      KIS_ACCOUNT_NO: ${{ secrets.KIS_ACCOUNT_NO }}
+      KIS_ENV: mock
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 의존성 설치
+        run: pip install -r requirements.txt
+
+      - name: 리밸런싱 (월요일 cron 또는 수동 rebalance)
+        if: github.event.schedule == '0 1 * * 1' || github.event.inputs.mode == 'rebalance'
+        run: python sector_live.py live
+
+      - name: 계좌 기록 (항상)
+        run: python track.py
+
+      - name: history 커밋
+        run: |
+          git config user.name "kis-bot"
+          git config user.email "kis-bot@users.noreply.github.com"
+          git add data/portfolio_history.json
+          git diff --staged --quiet || (git commit -m "history update $(date -u +%Y-%m-%dT%H:%MZ)" && git push)

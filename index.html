@@ -47,6 +47,10 @@
   th:first-child,td:first-child{text-align:left}
   tbody tr:last-child td{border-bottom:none}
   .tk{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+  .wt{display:flex;align-items:center;gap:7px;justify-content:flex-end}
+  .wt .bt{width:52px;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;flex:none}
+  .wt .bf{display:block;height:100%;background:var(--accent);border-radius:3px}
+  #cashNote{font-size:12px;color:var(--muted);margin-top:10px;text-align:right}
   .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
   .rule .rk{font-size:11.5px;color:var(--accent);letter-spacing:.03em;font-weight:600}
   .rule .rv{font-size:14px;margin-top:3px}
@@ -85,9 +89,10 @@
     <div class="panel">
       <h2>보유 종목</h2>
       <div style="overflow-x:auto"><table>
-        <thead><tr><th>종목</th><th>수량</th><th>현재가</th><th>평가금액</th><th>평가손익</th><th>수익률</th></tr></thead>
+        <thead><tr><th>종목</th><th>수량</th><th>현재가</th><th>평가금액</th><th>비중</th><th>평가손익</th><th>수익률</th></tr></thead>
         <tbody id="holdBody"></tbody>
       </table></div>
+      <div id="cashNote"></div>
     </div>
     <div class="panel">
       <h2>전략 규칙</h2>
@@ -129,13 +134,18 @@ function render(history){
   setV("tCash",won(last.cash)+"원","");
   setV("tCnt",last.holdings.length+"개","");
 
-  document.getElementById("holdBody").innerHTML=last.holdings.map(h=>`
+  document.getElementById("holdBody").innerHTML=last.holdings.map(h=>{
+    const w=last.total?h.value/last.total*100:0;
+    return `
     <tr><td>${h.name}<span class="tk"> ${h.code}</span></td>
     <td class="num">${h.qty.toLocaleString()}</td>
     <td class="num">${won(h.price)}</td>
     <td class="num">${won(h.value)}</td>
+    <td><div class="wt"><span class="num">${w.toFixed(1)}%</span><span class="bt"><span class="bf" style="width:${Math.min(100,w).toFixed(1)}%"></span></span></div></td>
     <td class="num ${cls(h.pnl)}">${h.pnl>=0?"+":""}${won(h.pnl)}</td>
-    <td class="num ${cls(h.rt)}">${pct(h.rt/100)}</td></tr>`).join("");
+    <td class="num ${cls(h.rt)}">${pct(h.rt/100)}</td></tr>`;}).join("");
+  const cashW=last.total?last.cash/last.total*100:0;
+  document.getElementById("cashNote").textContent=`현금 비중 ${cashW.toFixed(1)}% · 주식 ${(100-cashW).toFixed(1)}%`;
 
   const pts=[{date:INCEPTION,total:INIT},...history.map(h=>({date:h.date,total:h.total}))];
   const W=900,H=240,pad=44,vals=pts.map(p=>p.total);

@@ -2,7 +2,7 @@ name: KIS 섹터 순환매 자동매매
 
 on:
   schedule:
-    - cron: '0 1 * * 1'      # 월 01:00 UTC = 월 10:00 KST → 리밸런싱
+    - cron: '0 1 * * 1-5'    # 평일 01:00 UTC = 10:00 KST → 리밸런싱(자가복구: 매일 목표 유지 확인)
     - cron: '40 6 * * 1-5'   # 평일 06:40 UTC = 15:40 KST → 기록
   workflow_dispatch:          # 수동 실행(테스트용)
     inputs:
@@ -33,8 +33,8 @@ jobs:
       - name: 의존성 설치
         run: pip install -r requirements.txt
 
-      - name: 리밸런싱 (월요일 cron 또는 수동 rebalance)
-        if: github.event.schedule == '0 1 * * 1' || github.event.inputs.mode == 'rebalance'
+      - name: 리밸런싱 (평일 오전 cron 또는 수동 rebalance)
+        if: github.event.schedule == '0 1 * * 1-5' || github.event.inputs.mode == 'rebalance'
         run: python sector_live.py live
 
       - name: 계좌 기록 (항상)

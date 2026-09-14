@@ -7,6 +7,7 @@
         python sector_live.py live    (모의주문 실행)
 """
 import sys
+import time
 
 import FinanceDataReader as fdr
 
@@ -17,7 +18,20 @@ from sector_rotation import ETFS               # {etf코드: 섹터명}
 from sector_stocks import SECTOR_STOCKS        # {etf코드: [종목코드...]}
 
 LOOKBACK, SEC_K, STOCK_N, MA_REGIME = 20, 1, 3, 200
-CASH_USE = 0.95     # 가용현금의 95%까지 투입
+CASH_USE = 0.95         # 가용현금의 95%까지 투입
+SETTLE_TRIES = 16       # 매도대금 정산 대기 최대 횟수
+SETTLE_WAIT = 30        # 대기 간격(초) → 최대 8분
+
+
+def _retry(fn, tries=4, wait=3):
+    """네트워크 타임아웃 등 일시적 오류 시 재시도."""
+    for i in range(tries):
+        try:
+            return fn()
+        except Exception:
+            if i == tries - 1:
+                raise
+            time.sleep(wait)
 
 
 def series(code):
@@ -83,7 +97,7 @@ def main():
         print("\n조건 맞는 종목 없음.")
         return
 
-    hold, summary = get_balance()
+    hold, summary = _retry(get_balance)
     held = {h["종목코드"]: h for h in hold}
     universe = {c for codes in SECTOR_STOCKS.values() for c in codes}
     target = [c for c, _ in picks]
@@ -101,14 +115,30 @@ def main():
         print("  신규 매수 없음 (이미 목표 종목 보유 중)")
 
     if live:
-        print("\n[LIVE] 매도 실행...")
-        for c in to_sell:
-            try:
-                r = kis_order.order(c, held[c]["보유수량"], "sell")
-                print(f"  매도 {c} → {r['메시지']}")
-            except Exception as e:
-                print(f"  매도 {c} 오류: {e}")
-        _, summary = get_balance()   # 매도 후 현금 갱신
+        # 1) 목표 이탈 종목 매도
+        if to_sell:
+            print("\n[LIVE] 매도 실행...")
+            for c in to_sell:
+                try:
+                    r = _retry(lambda c=c: kis_order.order(c, held[c]["보유수량"], "sell"))
+                    print(f"  매도 {c} → {r['메시지']}")
+                except Exception as e:
+                    print(f"  매도 {c} 오류: {e}")
+            # 2) 매도대금이 '주문가능현금'에 잡힐 때까지 계속 체크 후 매수
+            if to_buy:
+                print("\n[대기] 매도대금 정산 확인 중 (현금 잡히면 매수)...")
+                for _ in range(SETTLE_TRIES):
+                    time.sleep(SETTLE_WAIT)
+                    try:
+                        _, s2 = _retry(get_balance)
+                    except Exception:
+                        continue
+                    summary = s2
+                    if s2["주문가능현금"] >= 0.9 * s2["총평가금액"]:
+                        print(f"  정산 완료: 주문가능현금 {s2['주문가능현금']:,}원")
+                        break
+                else:
+                    print("  (정산 지연 — 현재 현금으로 진행, 남은 건 다음 실행이 자동 완료)")
 
     cash = summary["주문가능현금"]
     budget = int(cash * CASH_USE / len(to_buy)) if to_buy else 0
@@ -116,7 +146,7 @@ def main():
     plan = []
     for code in to_buy:
         try:
-            px = get_price(code)["현재가"]
+            px = _retry(lambda code=code: get_price(code))["현재가"]
         except Exception as e:
             print(f"  {code} 현재가 오류: {e}"); continue
         qty = budget // px
@@ -131,7 +161,7 @@ def main():
         if qty < 1:
             continue
         try:
-            r = kis_order.order(code, qty, "buy")
+            r = _retry(lambda code=code, qty=qty: kis_order.order(code, qty, "buy"))
             print(f"  매수 {code} {qty}주 → {r['메시지']} (주문번호 {r['주문번호']})")
         except Exception as e:
             print(f"  매수 {code} 오류: {e}")

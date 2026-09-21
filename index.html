@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>섹터 순환매 포트폴리오</title>
+<title>코어+위성 포트폴리오</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -50,6 +50,21 @@
   .wt{display:flex;align-items:center;gap:7px;justify-content:flex-end}
   .wt .bt{width:52px;height:6px;background:var(--surface-2);border-radius:3px;overflow:hidden;flex:none}
   .wt .bf{display:block;height:100%;background:var(--accent);border-radius:3px}
+  .sig{display:flex;flex-wrap:wrap;gap:12px;align-items:stretch;margin-bottom:16px}
+  .sig .box{flex:1 1 160px;background:var(--surface-2);border-radius:10px;padding:12px 14px}
+  .sig .k{font-size:11.5px;color:var(--muted)} .sig .v{font-size:17px;font-weight:600;margin-top:4px}
+  .badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:600;color:#fff}
+  .badge.on{background:var(--up)} .badge.off{background:var(--down)}
+  .mrow{display:grid;grid-template-columns:minmax(120px,1.3fr) 3fr 64px;gap:10px;align-items:center;padding:5px 0;font-size:13.5px}
+  .mbar{position:relative;height:10px;background:var(--surface-2);border-radius:5px}
+  .mbar i{position:absolute;top:0;bottom:0;border-radius:5px}
+  .mbar .zero{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--muted)}
+  .pick{color:var(--accent);font-weight:600}
+  .seg{display:flex;height:8px;border-radius:4px;overflow:hidden;background:var(--surface-2);min-width:90px}
+  .seg .p{background:var(--accent)} .seg .h{background:var(--up);opacity:.75} .seg .s{background:var(--down);opacity:.75}
+  .legend{font-size:12px;color:var(--muted);margin-top:10px;display:flex;gap:14px;flex-wrap:wrap}
+  .legend b{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .act{font-size:12px;font-weight:600}
   #cashNote{font-size:12px;color:var(--muted);margin-top:10px;text-align:right}
   .rules{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
   .rule .rk{font-size:11.5px;color:var(--accent);letter-spacing:.03em;font-weight:600}
@@ -64,8 +79,8 @@
   <header>
     <div>
       <div class="eyebrow">모의투자 · 한국투자 KIS · 클라우드 자동</div>
-      <h1>섹터 순환매 포트폴리오</h1>
-      <div class="sub">국장 섹터 순환매 스윙 · 주1회 자동 리밸런싱 · 시작 2026-09-08</div>
+      <h1>코어+위성 자산배분</h1>
+      <div class="sub">영구포트폴리오 + HAA 75% · KODEX200 25% · 시작 2026-09-08 (섹터 순환매 → <span id="switchTxt">전환 대기</span>)</div>
     </div>
     <div class="hero-val">
       <div class="label">총 평가금액</div>
@@ -86,6 +101,20 @@
       <svg id="chart" viewBox="0 0 900 240" width="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="자산 곡선"></svg>
       <div class="chart-note" id="chartNote"></div>
     </div>
+    <div class="panel" id="stratPanel" hidden>
+      <h2>이번 달 신호</h2>
+      <div class="sig" id="sigBoxes"></div>
+      <div id="momRows"></div>
+      <div class="chart-note">HAA 모멘텀 = 1·3·6·12개월 수익률 평균(달러 기준). 카나리아(미국 물가채 TIP)가 0 이하면 공격자산을 모두 방어자산으로 교체.</div>
+    </div>
+    <div class="panel" id="tgtPanel" hidden>
+      <h2>목표 vs 현재 비중</h2>
+      <div style="overflow-x:auto"><table>
+        <thead><tr><th>종목</th><th>구성</th><th>목표</th><th>현재</th><th>차이</th><th>상태</th></tr></thead>
+        <tbody id="tgtBody"></tbody>
+      </table></div>
+      <div class="legend"><span><b style="background:var(--accent)"></b>영구포트폴리오</span><span><b style="background:var(--up);opacity:.75"></b>HAA</span><span><b style="background:var(--down);opacity:.75"></b>위성(KODEX200)</span><span id="bandNote"></span></div>
+    </div>
     <div class="panel">
       <h2>보유 종목</h2>
       <div style="overflow-x:auto"><table>
@@ -97,10 +126,10 @@
     <div class="panel">
       <h2>전략 규칙</h2>
       <div class="rules">
-        <div class="rule"><div class="rk">종목 선정</div><div class="rv">선도 섹터(20일 모멘텀 1위) 내 강한 종목 3개</div></div>
-        <div class="rule"><div class="rk">리밸런싱</div><div class="rv">매주 월요일 · 클라우드 자동</div></div>
-        <div class="rule"><div class="rk">하락장 방어</div><div class="rv">코스피 200일선 하회 시 전량 현금</div></div>
-        <div class="rule"><div class="rk">운영</div><div class="rv">GitHub Actions · 무인</div></div>
+        <div class="rule"><div class="rk">코어 ① 영구포트폴리오 37.5%</div><div class="rv">S&amp;P500 · 미국30년채 · 금 · 달러단기채 각 25% 고정</div></div>
+        <div class="rule"><div class="rk">코어 ② HAA 37.5%</div><div class="rv">7자산 중 모멘텀 상위 4개, 카나리아 음수면 전부 방어</div></div>
+        <div class="rule"><div class="rk">위성 25%</div><div class="rv">KODEX 200 보유 (코어와 상관 ≈ 0)</div></div>
+        <div class="rule"><div class="rk">리밸런싱</div><div class="rv">월말 신호 · 목표와 2%p 이상 벌어질 때만 매매 · 무인</div></div>
       </div>
     </div>
     <footer>KIS 모의투자 · 검증용(실제 돈 아님) · <span id="updated"></span></footer>
@@ -108,11 +137,13 @@
 </div>
 <script>
 const INIT=100000000, INCEPTION="2026-09-08";
+let STATE=null;
 const won=n=>Math.round(n).toLocaleString("ko-KR");
 const pct=r=>(r>=0?"+":"")+(r*100).toFixed(2)+"%";
 const cls=v=>v>0?"up":(v<0?"down":"");
 
-fetch("data/portfolio_history.json?"+Date.now())
+fetch("data/strategy_state.json?"+Date.now()).then(r=>r.ok?r.json():null).catch(()=>null)
+  .then(st=>{STATE=st;return fetch("data/portfolio_history.json?"+Date.now());})
   .then(r=>{if(!r.ok)throw new Error();return r.json();})
   .then(render)
   .catch(()=>{document.getElementById("msg").textContent="기록을 불러오지 못했습니다. (아직 데이터가 없거나 경로 확인 필요)";});
@@ -147,7 +178,9 @@ function render(history){
   const cashW=last.total?last.cash/last.total*100:0;
   document.getElementById("cashNote").textContent=`현금 비중 ${cashW.toFixed(1)}% · 주식 ${(100-cashW).toFixed(1)}%`;
 
-  const pts=[{date:INCEPTION,total:INIT},...history.map(h=>({date:h.date,total:h.total}))];
+  renderStrategy(last);
+  const isNew=h=>!!STATE&&h.holdings.some(x=>STATE.targets.some(t=>t.code===x.code));
+  const pts=[{date:INCEPTION,total:INIT},...history.map(h=>({date:h.date,total:h.total,sw:isNew(h)}))];
   const W=900,H=240,pad=44,vals=pts.map(p=>p.total);
   let lo=Math.min(...vals,INIT),hi=Math.max(...vals,INIT);
   const span=(hi-lo)||INIT*0.02; lo-=span*0.25; hi+=span*0.25;
@@ -162,6 +195,12 @@ function render(history){
     g+=`<path d="${line} L${X(pts.length-1).toFixed(1)} ${H-28} L${X(0).toFixed(1)} ${H-28} Z" fill="${color}" opacity="0.10"/>`;
     g+=`<path d="${line}" fill="none" stroke="${color}" stroke-width="2.5"/>`;
   }
+  const sw=pts.findIndex(p=>p.sw);
+  if(sw>0){
+    g+=`<line x1="${X(sw).toFixed(1)}" y1="18" x2="${X(sw).toFixed(1)}" y2="${H-28}" stroke="var(--accent)" stroke-dasharray="3 3"/>`;
+    g+=`<text x="${(X(sw)-6).toFixed(1)}" y="28" fill="var(--accent)" font-size="11" text-anchor="end">코어+위성 전환</text>`;
+    document.getElementById("switchTxt").textContent=pts[sw].date+" 전환";
+  }
   pts.forEach((p,i)=>{
     g+=`<circle cx="${X(i).toFixed(1)}" cy="${Y(p.total).toFixed(1)}" r="${i===pts.length-1?5:3}" fill="${i===pts.length-1?color:"var(--muted)"}"/>`;
     if(i===0||i===pts.length-1||pts.length<=8)
@@ -171,6 +210,42 @@ function render(history){
   document.getElementById("chart").innerHTML=g;
   document.getElementById("chartNote").textContent=pts.length<3?"자산 곡선은 매 거래일 자동 기록되며 쌓입니다.":"";
   document.getElementById("updated").textContent="최근 기록 "+last.date+" "+(last.time||"");
+}
+
+function renderStrategy(last){
+  if(!STATE)return;
+  const S=STATE, atk=S.mode==="공격";
+  document.getElementById("stratPanel").hidden=false;
+  document.getElementById("tgtPanel").hidden=false;
+  document.getElementById("sigBoxes").innerHTML=`
+    <div class="box"><div class="k">신호 기준월</div><div class="v num">${S.signal_month} 월말</div></div>
+    <div class="box"><div class="k">카나리아 (TIP 모멘텀)</div><div class="v num ${cls(S.canary)}">${pct(S.canary)}</div></div>
+    <div class="box"><div class="k">HAA 모드</div><div class="v"><span class="badge ${atk?"on":"off"}">${S.mode}</span> <span style="font-size:12.5px;color:var(--muted);font-weight:400">${atk?"상위 4자산 보유":"전액 "+S.safe}</span></div></div>
+    <div class="box"><div class="k">위성</div><div class="v" style="font-size:14px">${S.sat_on?"KODEX 200 보유":"현금성(핼러윈 휴식기)"}</div></div>`;
+  const mx=Math.max(0.05,...S.scores.map(x=>Math.abs(x.score)));
+  document.getElementById("momRows").innerHTML=[...S.scores].sort((a,b)=>b.score-a.score).map(x=>{
+    const w=Math.abs(x.score)/mx*50, left=x.score>=0?50:50-w;
+    return `<div class="mrow"><div class="${x.picked?"pick":""}">${x.picked?"● ":""}${x.name}</div>
+      <div class="mbar"><i style="left:${left}%;width:${w}%;background:${x.score>=0?"var(--up)":"var(--down)"};opacity:${x.picked?1:.45}"></i><span class="zero" style="left:50%"></span></div>
+      <div class="num ${cls(x.score)}" style="text-align:right">${pct(x.score)}</div></div>`;}).join("");
+  const held={}; last.holdings.forEach(h=>held[h.code]=h);
+  const codes=new Set(S.targets.map(t=>t.code));
+  let rows=S.targets.map(t=>{
+    const cur=held[t.code]?held[t.code].value/last.total:0, d=cur-t.weight;
+    const ok=Math.abs(d)<S.band&&!(cur===0&&t.weight>0);
+    const tot=t.weight||1;
+    return `<tr><td>${t.name}<span class="tk"> ${t.code}</span></td>
+      <td><div class="seg" title="영구 ${(t.perm*100).toFixed(1)}% · HAA ${(t.haa*100).toFixed(1)}% · 위성 ${(t.sat*100).toFixed(1)}%"><span class="p" style="width:${t.perm/tot*100}%"></span><span class="h" style="width:${t.haa/tot*100}%"></span><span class="s" style="width:${t.sat/tot*100}%"></span></div></td>
+      <td class="num">${(t.weight*100).toFixed(1)}%</td><td class="num">${(cur*100).toFixed(1)}%</td>
+      <td class="num ${cls(d)}">${(d>=0?"+":"")+(d*100).toFixed(1)}%p</td>
+      <td class="act" style="color:${ok?"var(--muted)":"var(--accent)"}">${ok?"범위 내":(d<0?"매수 예정":"매도 예정")}</td></tr>`;}).join("");
+  last.holdings.filter(h=>!codes.has(h.code)).forEach(h=>{
+    const cur=h.value/last.total;
+    rows+=`<tr><td>${h.name}<span class="tk"> ${h.code}</span></td><td style="font-size:12px;color:var(--muted)">전략 외</td>
+      <td class="num">0.0%</td><td class="num">${(cur*100).toFixed(1)}%</td><td class="num up">+${(cur*100).toFixed(1)}%p</td>
+      <td class="act" style="color:var(--accent)">매도 예정</td></tr>`;});
+  document.getElementById("tgtBody").innerHTML=rows;
+  document.getElementById("bandNote").textContent=`· 목표와 ${(S.band*100).toFixed(0)}%p 이상 벌어지면 다음 평일 10시에 자동 조정`;
 }
 </script>
 </body>

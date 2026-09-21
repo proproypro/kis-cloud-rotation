@@ -1,4 +1,4 @@
-name: KIS 섹터 순환매 자동매매
+name: KIS 코어+위성 자산배분 자동매매
 
 on:
   schedule:
@@ -36,7 +36,7 @@ jobs:
 
       - name: 리밸런싱 (평일 오전 cron 또는 수동 rebalance)
         if: github.event.schedule == '0 1 * * 1-5' || github.event.inputs.mode == 'rebalance'
-        run: python sector_live.py live
+        run: python core_satellite.py live
 
       - name: 계좌 기록 (항상)
         run: python track.py
@@ -45,5 +45,5 @@ jobs:
         run: |
           git config user.name "kis-bot"
           git config user.email "kis-bot@users.noreply.github.com"
-          git add data/portfolio_history.json
+          git add data/portfolio_history.json data/strategy_state.json
           git diff --staged --quiet || (git commit -m "history update $(date -u +%Y-%m-%dT%H:%MZ)" && git push)

@@ -1,0 +1,101 @@
+{
+ "computed": "2026-09-21",
+ "signal_month": "2026-08",
+ "canary": -0.004,
+ "mode": "방어",
+ "safe": "TIGER 미국달러단기채권액티브",
+ "satellite_mode": "hold",
+ "sat_on": true,
+ "band": 0.02,
+ "scores": [
+  {
+   "asset": "SPY",
+   "name": "TIGER 미국S&P500",
+   "score": 0.0924,
+   "picked": false
+  },
+  {
+   "asset": "QQQ",
+   "name": "TIGER 미국나스닥100",
+   "score": 0.1148,
+   "picked": false
+  },
+  {
+   "asset": "EFA",
+   "name": "KODEX MSCI선진국",
+   "score": 0.0774,
+   "picked": false
+  },
+  {
+   "asset": "KOSPI",
+   "name": "KODEX 200",
+   "score": 0.2679,
+   "picked": false
+  },
+  {
+   "asset": "GLD",
+   "name": "ACE KRX금현물",
+   "score": 0.0517,
+   "picked": false
+  },
+  {
+   "asset": "IEF",
+   "name": "TIGER 미국채10년선물",
+   "score": -0.0104,
+   "picked": false
+  },
+  {
+   "asset": "TLT",
+   "name": "ACE 미국30년국채액티브",
+   "score": -0.0233,
+   "picked": false
+  }
+ ],
+ "targets": [
+  {
+   "code": "329750",
+   "name": "TIGER 미국달러단기채권액티브",
+   "asset": "SHY",
+   "weight": 0.4688,
+   "perm": 0.0938,
+   "haa": 0.375,
+   "sat": 0.0
+  },
+  {
+   "code": "069500",
+   "name": "KODEX 200",
+   "asset": "KOSPI",
+   "weight": 0.25,
+   "perm": 0.0,
+   "haa": 0.0,
+   "sat": 0.25
+  },
+  {
+   "code": "360750",
+   "name": "TIGER 미국S&P500",
+   "asset": "SPY",
+   "weight": 0.0938,
+   "perm": 0.0938,
+   "haa": 0.0,
+   "sat": 0.0
+  },
+  {
+   "code": "476760",
+   "name": "ACE 미국30년국채액티브",
+   "asset": "TLT",
+   "weight": 0.0938,
+   "perm": 0.0938,
+   "haa": 0.0,
+   "sat": 0.0
+  },
+  {
+   "code": "411060",
+   "name": "ACE KRX금현물",
+   "asset": "GLD",
+   "weight": 0.0938,
+   "perm": 0.0938,
+   "haa": 0.0,
+   "sat": 0.0
+  }
+ ]
+}

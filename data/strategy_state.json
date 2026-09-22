@@ -1,5 +1,5 @@
 {
- "computed": "2026-09-21",
+ "computed": "2026-09-22",
  "signal_month": "2026-08",
  "canary": -0.004,
  "mode": "방어",
@@ -11,7 +11,7 @@
   {
    "asset": "SPY",
    "name": "TIGER 미국S&P500",
-   "score": 0.0924,
+   "score": 0.0925,
    "picked": false
   },
   {

@@ -1,5 +1,5 @@
 {
- "computed": "2026-10-13",
+ "computed": "2026-10-14",
  "signal_month": "2026-09",
  "canary": -0.0265,
  "mode": "방어",
@@ -29,7 +29,7 @@
   {
    "asset": "KOSPI",
    "name": "KODEX 200",
-   "score": 0.2684,
+   "score": 0.2899,
    "picked": false
   },
   {

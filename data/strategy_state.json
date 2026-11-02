@@ -1,8 +1,8 @@
 {
- "computed": "2026-10-30",
- "signal_month": "2026-09",
- "canary": -0.0265,
- "mode": "방어",
+ "computed": "2026-11-02",
+ "signal_month": "2026-10",
+ "canary": 0.0032,
+ "mode": "공격",
  "safe": "TIGER 미국달러단기채권액티브",
  "satellite_mode": "hold",
  "sat_on": true,
@@ -11,56 +11,47 @@
   {
    "asset": "SPY",
    "name": "TIGER 미국S&P500",
-   "score": 0.0891,
-   "picked": false
+   "score": 0.0455,
+   "picked": true
   },
   {
    "asset": "QQQ",
    "name": "TIGER 미국나스닥100",
-   "score": 0.1403,
-   "picked": false
+   "score": 0.0193,
+   "picked": true
   },
   {
    "asset": "EFA",
    "name": "KODEX MSCI선진국",
-   "score": 0.0511,
-   "picked": false
+   "score": 0.0329,
+   "picked": true
   },
   {
    "asset": "KOSPI",
    "name": "KODEX 200",
-   "score": 0.2899,
+   "score": -0.0074,
    "picked": false
   },
   {
    "asset": "GLD",
    "name": "ACE KRX금현물",
-   "score": -0.0193,
+   "score": -0.0755,
    "picked": false
   },
   {
    "asset": "IEF",
    "name": "TIGER 미국채10년선물",
-   "score": -0.0405,
+   "score": -0.0,
    "picked": false
   },
   {
    "asset": "TLT",
    "name": "ACE 미국30년국채액티브",
-   "score": -0.0787,
+   "score": -0.0025,
    "picked": false
   }
  ],
  "targets": [
-  {
-   "code": "329750",
-   "name": "TIGER 미국달러단기채권액티브",
-   "asset": "SHY",
-   "weight": 0.4688,
-   "perm": 0.0938,
-   "haa": 0.375,
-   "sat": 0.0
-  },
   {
    "code": "069500",
    "name": "KODEX 200",
@@ -74,9 +65,18 @@
    "code": "360750",
    "name": "TIGER 미국S&P500",
    "asset": "SPY",
-   "weight": 0.0938,
+   "weight": 0.1875,
    "perm": 0.0938,
-   "haa": 0.0,
+   "haa": 0.0938,
+   "sat": 0.0
+  },
+  {
+   "code": "329750",
+   "name": "TIGER 미국달러단기채권액티브",
+   "asset": "SHY",
+   "weight": 0.1875,
+   "perm": 0.0938,
+   "haa": 0.0938,
    "sat": 0.0
   },
   {
@@ -95,6 +95,24 @@
    "weight": 0.0938,
    "perm": 0.0938,
    "haa": 0.0,
+   "sat": 0.0
+  },
+  {
+   "code": "251350",
+   "name": "KODEX MSCI선진국",
+   "asset": "EFA",
+   "weight": 0.0938,
+   "perm": 0.0,
+   "haa": 0.0938,
+   "sat": 0.0
+  },
+  {
+   "code": "133690",
+   "name": "TIGER 미국나스닥100",
+   "asset": "QQQ",
+   "weight": 0.0938,
+   "perm": 0.0,
+   "haa": 0.0938,
    "sat": 0.0
   }
  ]

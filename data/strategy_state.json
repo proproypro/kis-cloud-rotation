@@ -1,5 +1,5 @@
 {
- "computed": "2026-11-06",
+ "computed": "2026-11-09",
  "signal_month": "2026-10",
  "canary": 0.0032,
  "mode": "공격",
@@ -41,13 +41,13 @@
   {
    "asset": "IEF",
    "name": "TIGER 미국채10년선물",
-   "score": -0.0035,
+   "score": -0.0,
    "picked": false
   },
   {
    "asset": "TLT",
    "name": "ACE 미국30년국채액티브",
-   "score": -0.0065,
+   "score": -0.0025,
    "picked": false
   }
  ],
